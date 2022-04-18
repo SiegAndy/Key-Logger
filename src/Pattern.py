@@ -9,10 +9,28 @@ from utils import mapping
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 
+def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
+    # print(input_dict)
+    for attribute, value in input_dict.items():
+        if 'uuid' in attribute.lower():
+            continue
+        key = '_' + attribute
+        try:
+            value = int(value)
+        except:
+            pass
+        setattr(cls, key, value)
+    # print(self.__dict__)
+    return cls
+
 
 class stringifyable:
     
     category = "Stringifyable"
+
+    @dispatch()
+    def __init__(self) -> None:
+        pass
 
     def stringify(self):
 
@@ -45,23 +63,14 @@ class stringifyable:
         result = dict()
         result[self.category] = dict()
         for name, value in self.__dict__.items():
-            result[name.lstrip('_')] = value
+            result[self.category][name.lstrip('_')] = value
+        # print(result)
         return result
 
-    @staticmethod
+    @classmethod
     def fromDict(cls, input_dict: Dict[str, Dict]):
-        for category, attribute_values in input_dict.items():
-            for attribute, value in attribute_values.items():
-                if 'uuid' in attribute.lower():
-                    continue
-                key = '_' + attribute
-                try:
-                    value = int(value)
-                except:
-                    pass
-                setattr(cls, key, value)
-            # print(self.__dict__)
-        return cls
+        cls = cls()
+        return dict_to_object(cls=cls, input_dict=input_dict)
 
 
 class KeyCombination(stringifyable):
@@ -99,7 +108,6 @@ class KeyCombination(stringifyable):
     def stop_key(self, new_stop_key: str):
         self._stop_key = new_stop_key
         return self._stop_key
-
 
 
 class Repeat(stringifyable):
@@ -196,6 +204,7 @@ class Repeat(stringifyable):
 
 DEFAULTREPEAT = Repeat(1)
 DEFAULTCOMB = KeyCombination()
+SCRIPT = "Script"
 
 class Pattern(stringifyable):
     """
@@ -206,7 +215,13 @@ class Pattern(stringifyable):
         pattern is like ["KeyDown C", "Delay 10", "KeyUp C", "Delay 1000", "KeyPress C 3"]
         it means: press C down for 10 msec and relase C, delay 1000msec (1sec) and then press and release C for three times.
     """
+    
+    @dispatch()
+    def __init__(self) -> None:
+        self.reset()
 
+
+    @dispatch(str, repeat=Repeat, key_comb=KeyCombination)
     def __init__(
         self,
         name: str,
@@ -215,9 +230,6 @@ class Pattern(stringifyable):
     ) -> None:
 
         # print(start_counter, stop_counter, step, stop_time_interval)
-
-        self.reset()
-        self.mapping = mapping
 
         self.name = name
         self.uuid = uuid.uuid4()
@@ -233,6 +245,7 @@ class Pattern(stringifyable):
         
     def reset(self):
         self.pattern: List[Callable] = []
+        self.mapping = mapping
 
 
     def create_pattern(self, commands: List[str]):
@@ -305,6 +318,7 @@ class Pattern(stringifyable):
 
         return self.pattern
 
+
     def execute(self, hwnd):
         def execute_pattern():
             print(self.pattern)
@@ -318,7 +332,8 @@ class Pattern(stringifyable):
 
     def stringify(self):
         general = self._key_comb.stringify()
-        general += f"UUID={self.uuid}\n"
+        general += f"uuid={self.uuid}\n"
+        general += f"name={self.name}\n"
         repeat = self._repeat.stringify()
         script = "[Script]\n"
         for command in self.commands:
@@ -353,11 +368,40 @@ class Pattern(stringifyable):
 
     def toDict(self):
         general = self._key_comb.toDict()
-        general["Name"] = self.name
-        general["UUID"] = self.uuid
+        # print(general)
+        general_category = self._key_comb.category
+        general[general_category]["name"] = self.name
+        general[general_category]["uuid"] = self.uuid
+
         repeat = self._repeat.toDict()
-        script = "[Script]\n"
-        for command in self.commands:
-            script += f"{command}\n"
+
+        pattern = {**general, **repeat}
+
+        if self.commands is not None:
+            pattern[SCRIPT] = self.commands
         
-        return general + repeat + script
+        return pattern
+
+    @classmethod
+    def fromDict(cls, input_dict: Dict[str, Dict]):
+        cls = cls()
+        # print(input_dict)
+        general = input_dict[DEFAULTCOMB.category]
+        repeat = input_dict[DEFAULTREPEAT.category]
+        scripts = input_dict[SCRIPT]
+
+        name = general.pop("name")
+        uuid = general.pop("uuid")
+        setattr(cls, "name", name)
+        setattr(cls, "uuid", uuid)
+
+        key_comb = KeyCombination.fromDict(input_dict=general)
+        setattr(cls, "_key_comb", key_comb)
+
+        repeat = KeyCombination.fromDict(input_dict=repeat)
+        setattr(cls, "_repeat", repeat)
+        
+        if scripts is not None:
+            cls.create_pattern(scripts)
+
+        return cls

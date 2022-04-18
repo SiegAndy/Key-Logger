@@ -1,6 +1,6 @@
 import os, re
 from typing import Any, Dict, List, Union
-from filesystem import create_directory, find_dir
+from .filesystem import create_directory, find_dir
 
 """
 klp is abbreviation of key-logger-pattern. 
@@ -125,17 +125,17 @@ def klp_to_dict(filename: str):
 # print(bb.group(1), bb.group(2))
 
 
-dummy = {
-    "scripts":[
-            "aaa",
-            "bbb"
-        ],
-        "<category>": {
-            "attribute_1": "value_1",
-            "attribute_2": "value_2",
-        },
+# dummy = {
+#     "scripts":[
+#             "aaa",
+#             "bbb"
+#         ],
+#         "<category>": {
+#             "attribute_1": "value_1",
+#             "attribute_2": "value_2",
+#         },
         
-    }
-dict_to_klp("test", dummy)
-result = klp_to_dict("src/scripts/test.klp")
-assert result == dummy
+#     }
+# dict_to_klp("test", dummy)
+# result = klp_to_dict("src/scripts/test.klp")
+# assert result == dummy
