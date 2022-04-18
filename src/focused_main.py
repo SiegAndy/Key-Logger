@@ -4,12 +4,12 @@ import logging
 from multiprocessing import Process, current_process
 from time import sleep
 from typing import List, Tuple
-from KeyReader import detect_key_kbhit, detect_target_key
+from focused_KeyReader import detect_key_kbhit, detect_target_key
 
 
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(message)s',
-                    handlers=[logging.FileHandler("example1.log"),
+                    format='%(levelname)s - %(asctime)s: %(message)s',
+                    handlers=[logging.FileHandler("keylogger.log"),
                               logging.StreamHandler()])
 
 

@@ -1,94 +1,81 @@
-import msvcrt
-from typing import Union
+import logging
+from time import sleep
+from pynput import keyboard
+from functools import partial
+from collections import defaultdict
+from typing import Dict, List, Tuple
+from multiprocessing import Process, current_process
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(asctime)s: %(message)s',
+                    handlers=[logging.FileHandler("keylogger.log"),
+                              logging.StreamHandler()])
 
 
-# msvcrt function key mapping
-FUNCTIONKEY = {
-    "F1": (0, 59),
-    "F2": (0, 60),
-    "F3": (0, 61),
-    "F4": (0, 62),
-    "F5": (0, 63),
-    "F6": (0, 64),
-    "F7": (0, 65),
-    "F8": (0, 66),
-    "F9": (0, 67),
-    "F10": (0, 68),
-    "F11": (0, 69),
-    "F12": (224, 134),
-    "INS": (224, 82),
-    "HOME": (224, 71),
-    "PageUp": (224, 73),
-    "DEL": (224, 83),
-    "END": (224, 79),
-    "PageDown": (224, 81),
-    "Arrow Up": (224, 72),
-    "Arrow Down": (224, 80),
-    "Arrow Left": (224, 75),
-    "Arrow Right": (224, 77),
-}
+def dummy_func():
+    name = current_process().name
+
+    for i in range (10):
+        logging.info(f"{name} is looping")
+        sleep(2)
+
+    logging.info(f"{name} finished")
 
 
-Reverse_Mapping = {}
-for key, value in FUNCTIONKEY.items():
-    Reverse_Mapping[value] = key
-
-
-def detect_key_kbhit() -> Union[None, str]:
-    """
-    Convert every valid keypress to key name and return that key name
-    Default return None otherwise
-    """
-    if msvcrt.kbhit():
-        ret = ord(msvcrt.getch())
-        # print(ret)
-        if ret == 0 or ret == 224:
-            second = ord(msvcrt.getch())
-            return Reverse_Mapping[(ret, second)]
-        else:
-            return chr(ret)
-
-
-def detect_target_key_kbhit(ascii_code):
-    """
-    Check whether received keypress code is the target key's ascii code
-    """
-    if msvcrt.kbhit():
-        ret = ord(msvcrt.getch())
-        # print(ret)
-        if (ret == 0 or ret == 224) and ascii_code[0] == ret and len(ascii_code) == 2:
-            second = ord(msvcrt.getch())
-            # print(second)
-            if second == ascii_code[1]:
-                return True
-        elif ascii_code[0] == ret and len(ascii_code) == 1:
-            return True
-    return False
-
-
-def detect_target_key(key):
-    """
-    Loop until target_key is found
-    # When looping, it will keep yield False
-    After loop terminate, it will return True
-    """
+def on_press_prep(curr_key, key_combs: Dict[str, str], working_pattern: Dict[str, List[Tuple[Process, str]]]):
     try:
-        ascii_code = FUNCTIONKEY[key]
-    except KeyError as e:
-        ascii_code = [ord(key)]
-    while not detect_target_key_kbhit(ascii_code):
+        curr_char = curr_key.char
+        # print(f'Alphanumeric key pressed: {curr_char}')
+    except AttributeError:
+        # print(f'special key pressed: {curr_key}')
         pass
-    return True
+def on_press(key_combs, working_pattern):
+    return partial(on_press_prep, key_combs=key_combs, working_pattern=working_pattern)
 
 
-def detect_key():
-    """
-    Looping endless for detecting activate key for each pattern
-    """
-    while True:
-        curr = detect_key_kbhit()
-        if curr is not None:
-            print(curr)
-        
+def on_release_prep(curr_key, key_combs: Dict[str, str], working_pattern: Dict[str, List[Tuple[Process, str]]]):
+    # print(f'Key released: {curr_key}')
+    if curr_key == keyboard.Key[SUPER_EXIT]:
+        # exit on the super exit key
+        logging.info("Terminating keyboard listener. Exiting program...")
+        return False
     
-# detect_key()
+    try:
+        curr_key = curr_key.char
+        # print(f'Alphanumeric key pressed: {curr_key}')
+    except AttributeError:
+        # special key are presented in format Key.{special}
+        curr_key = str(curr_key).split('.')[1]
+        # print(f'special key pressed: {curr_key}')
+
+    if curr_key in key_combs.keys():
+        # current key is one of start key
+        stop_key = key_combs.pop(curr_key)
+        # stop_key_reader = Process(target=detect_target_key, args=[stop_key], daemon=True, name=f"KeyReader_{curr}_{stop_key}")
+        dummy = Process(target=dummy_func, args=[], daemon=True, name=f"dummy_{curr_key}_{stop_key}")
+        dummy.start()
+        working_pattern[stop_key].append((dummy, curr_key))
+
+    if curr_key in working_pattern.keys():
+        # current key is one of stop key
+            need_to_stop = working_pattern.pop(curr_key)
+            for process, start_key in need_to_stop:
+                if process.is_alive():
+                    process.terminate()
+                logging.info(f"{process.name} terminated. start key: {start_key}, stop key:{curr_key}")
+                key_combs[start_key] = curr_key
+
+def on_release(key_combs, working_pattern):
+    return partial(on_release_prep, key_combs=key_combs, working_pattern=working_pattern)
+
+
+
+if __name__ == "__main__":
+    SUPER_EXIT = "f12"
+    key_combs = {"f2": "f1", "f3":"f1"}
+    working_pattern = defaultdict(list[Tuple[Process, str]])
+    # Collect events until released
+    with keyboard.Listener(
+            on_press=on_press(key_combs, working_pattern),
+            on_release=on_release(key_combs, working_pattern)) as listener:
+        listener.join()
