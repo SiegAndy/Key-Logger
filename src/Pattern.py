@@ -1,7 +1,7 @@
 import json
 import time
 from typing import Callable, List, Tuple
-from logger import KeyDown, KeyUp, KeyPress, Delay
+from Logger import KeyDown, KeyUp, KeyPress, Delay
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 
