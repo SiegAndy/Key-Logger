@@ -10,6 +10,8 @@ Default storage folder would be at ~/src/scripts
 It accepts dictionary or object.__dict__ to be converted as specific format of string and stored in *.klp
 """
 
+
+
 class FormatError(Exception):
     pass
 
@@ -33,6 +35,8 @@ def dict_to_klp(filename: str, object: Dict[Any, dict], indent: int = 0):
         }
         ...
     }
+
+    return klp string
     """
     
     indent = " " * indent
@@ -51,10 +55,13 @@ def dict_to_klp(filename: str, object: Dict[Any, dict], indent: int = 0):
     with open(os.path.join(script_path, f"{filename}.klp"), 'w', encoding='utf-8') as klp:
         klp.write(contents)
 
+    return contents
+
 
 def klp_to_dict(filename: str):
     """
-    filename should be same as the name attribute in Pattern object
+    filename should be full path (relative or absolute)
+
     object should be in format {
         <category>: {
             attribute_1: value_1,
@@ -82,6 +89,10 @@ def klp_to_dict(filename: str):
                 continue
             
             line = line.strip('\n')
+            if current_category is not None and "script" not in current_category.lower():
+                # remove indents which are whitespace for every non-script section
+                line = [elem for elem in line.split(' ') if elem][0]
+
             attribute_value = re_attribute.match(line)
             category = re_category.match(line)
             # print(f"current line: {line}, {is_script}")
@@ -113,29 +124,3 @@ def klp_to_dict(filename: str):
                 
     
     return result_dict
-
-
-# category_pattern = r"\[(.*)\]"
-# attribute_pattern = r"(.*)=(.*)"
-# a = re.compile(category_pattern)
-# b = re.compile(attribute_pattern)
-# print(a.match("[mycategory]").group(1))
-# bb = b.match("mytest=tesvalue")
-# print(a.match(attribute_pattern))
-# print(bb.group(1), bb.group(2))
-
-
-# dummy = {
-#     "scripts":[
-#             "aaa",
-#             "bbb"
-#         ],
-#         "<category>": {
-#             "attribute_1": "value_1",
-#             "attribute_2": "value_2",
-#         },
-        
-#     }
-# dict_to_klp("test", dummy)
-# result = klp_to_dict("src/scripts/test.klp")
-# assert result == dummy

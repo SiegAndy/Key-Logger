@@ -1,7 +1,6 @@
 import json, time
 import logging
-import uuid
-
+from uuid import UUID, uuid4
 from multipledispatch import dispatch
 from typing import IO, Callable, Dict, List, Optional, Tuple
 from Logger import KeyDown, KeyUp, KeyPress, Delay
@@ -231,8 +230,8 @@ class Pattern(stringifyable):
 
         # print(start_counter, stop_counter, step, stop_time_interval)
 
-        self.name = name
-        self.uuid = uuid.uuid4()
+        self._name = name
+        self._uuid = uuid4()
 
         self._repeat = repeat
         if repeat is None:
@@ -242,6 +241,31 @@ class Pattern(stringifyable):
         if key_comb is None:
             self._key_comb = DEFAULTCOMB
 
+    @property
+    def repeat(self) -> Repeat:
+        return self._repeat
+    
+    @property
+    def key_comb(self) -> KeyCombination:
+        return self._key_comb
+
+    @property
+    def name(self) -> str:
+        return self._name
+    
+    @name.setter
+    def name(self, new_name: str) -> str:
+        self._name = new_name
+        return self._name
+    
+    @property
+    def uuid(self) -> UUID:
+        return self._uuid
+    
+    @uuid.setter
+    def uuid(self, new_uuid: UUID) -> UUID:
+        self._uuid = new_uuid
+        return self._uuid
         
     def reset(self):
         self.pattern: List[Callable] = []
@@ -332,8 +356,8 @@ class Pattern(stringifyable):
 
     def stringify(self):
         general = self._key_comb.stringify()
-        general += f"uuid={self.uuid}\n"
-        general += f"name={self.name}\n"
+        general += f"uuid={self._uuid}\n"
+        general += f"name={self._name}\n"
         repeat = self._repeat.stringify()
         script = "[Script]\n"
         for command in self.commands:
@@ -347,7 +371,7 @@ class Pattern(stringifyable):
         general, repeat_script = load_string.split(f"[{DEFAULTREPEAT.category}]")
 
         # retrieve uuid from string
-        self.uuid = [elem for elem in general.split('\n') if elem][-1].split('=')[1]
+        self._uuid = [elem for elem in general.split('\n') if elem][-1].split('=')[1]
 
         # retrieve key combination from string
         self._key_comb = KeyCombination().unstringify(general)
@@ -370,8 +394,8 @@ class Pattern(stringifyable):
         general = self._key_comb.toDict()
         # print(general)
         general_category = self._key_comb.category
-        general[general_category]["name"] = self.name
-        general[general_category]["uuid"] = self.uuid
+        general[general_category]["name"] = self._name
+        general[general_category]["uuid"] = self._uuid
 
         repeat = self._repeat.toDict()
 
@@ -392,8 +416,8 @@ class Pattern(stringifyable):
 
         name = general.pop("name")
         uuid = general.pop("uuid")
-        setattr(cls, "name", name)
-        setattr(cls, "uuid", uuid)
+        setattr(cls, "_name", name)
+        setattr(cls, "_uuid", uuid)
 
         key_comb = KeyCombination.fromDict(input_dict=general)
         setattr(cls, "_key_comb", key_comb)
@@ -401,6 +425,7 @@ class Pattern(stringifyable):
         repeat = KeyCombination.fromDict(input_dict=repeat)
         setattr(cls, "_repeat", repeat)
         
+        # print(scripts)
         if scripts is not None:
             cls.create_pattern(scripts)
 
