@@ -1,4 +1,4 @@
-{
+mapping = {
     "Left mouse button": {
         "alias": "VK_LBUTTON",
         "virtual_key": "0x01"

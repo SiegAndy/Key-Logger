@@ -1,0 +1,6 @@
+[scripts]
+aaa
+bbb
+[<category>]
+attribute_1=value_1
+attribute_2=value_2

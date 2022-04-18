@@ -3,8 +3,9 @@ import logging
 import uuid
 
 from multipledispatch import dispatch
-from typing import IO, Callable, List, Optional, Tuple
+from typing import IO, Callable, Dict, List, Optional, Tuple
 from Logger import KeyDown, KeyUp, KeyPress, Delay
+from utils import mapping
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 
@@ -39,6 +40,28 @@ class stringifyable:
             setattr(self, key, value)
         # print(self.__dict__)
         return self
+    
+    def toDict(self):
+        result = dict()
+        result[self.category] = dict()
+        for name, value in self.__dict__.items():
+            result[name.lstrip('_')] = value
+        return result
+
+    @staticmethod
+    def fromDict(cls, input_dict: Dict[str, Dict]):
+        for category, attribute_values in input_dict.items():
+            for attribute, value in attribute_values.items():
+                if 'uuid' in attribute.lower():
+                    continue
+                key = '_' + attribute
+                try:
+                    value = int(value)
+                except:
+                    pass
+                setattr(cls, key, value)
+            # print(self.__dict__)
+        return cls
 
 
 class KeyCombination(stringifyable):
@@ -186,6 +209,7 @@ class Pattern(stringifyable):
 
     def __init__(
         self,
+        name: str,
         repeat: Repeat = None,
         key_comb: KeyCombination = None,
     ) -> None:
@@ -193,8 +217,9 @@ class Pattern(stringifyable):
         # print(start_counter, stop_counter, step, stop_time_interval)
 
         self.reset()
-        self.mapping = self.get_vk_mapping()
+        self.mapping = mapping
 
+        self.name = name
         self.uuid = uuid.uuid4()
 
         self._repeat = repeat
@@ -209,10 +234,6 @@ class Pattern(stringifyable):
     def reset(self):
         self.pattern: List[Callable] = []
 
-    @staticmethod
-    def get_vk_mapping():
-        with open("utils/key_mapping.json", "r", encoding="utf-8") as input:
-            return json.load(input)
 
     def create_pattern(self, commands: List[str]):
         def create_keyboard_command(action, key, num):
@@ -330,9 +351,13 @@ class Pattern(stringifyable):
 
         return self
 
-    def unstringifyf(self, fd: IO):
-        """
-        unstringify a Pattern object directly from file descriptor
-        """
-        pass
-    
+    def toDict(self):
+        general = self._key_comb.toDict()
+        general["Name"] = self.name
+        general["UUID"] = self.uuid
+        repeat = self._repeat.toDict()
+        script = "[Script]\n"
+        for command in self.commands:
+            script += f"{command}\n"
+        
+        return general + repeat + script
