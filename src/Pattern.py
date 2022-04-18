@@ -1,5 +1,4 @@
-import json
-import time
+import json, time
 from typing import Callable, List, Tuple
 from Logger import KeyDown, KeyUp, KeyPress, Delay
 
@@ -12,7 +11,7 @@ class Pattern:
     command should be in format
         "<KeyDown|KeyUp|KeyPress> <key> [Number of Key Actions]" for keyboard event
         "Delay <msec>" for delay event
-        pattern is like ["KeyDown C", "Delay 10", "KeyUp C", "Delay 10", "KeyPress C 3"]
+        pattern is like ["KeyDown C", "Delay 10", "KeyUp C", "Delay 1000", "KeyPress C 3"]
         it means: press C down for 10 msec and relase C, delay 1000msec (1sec) and then press and release C for three times.
     """
 

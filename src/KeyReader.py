@@ -1,22 +1,8 @@
 import msvcrt
-import threading
+from typing import Union
 
 
-class StoppableThread(threading.Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
-
-    def __init__(self, *args, **kwargs):
-        super(StoppableThread, self).__init__(*args, **kwargs)
-        self._stop_event = threading.Event()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-
-
+# msvcrt function key mapping
 FUNCTIONKEY = {
     "F1": (0, 59),
     "F2": (0, 60),
@@ -43,7 +29,30 @@ FUNCTIONKEY = {
 }
 
 
-def detect_key_kbhit(ascii_code):
+Reverse_Mapping = {}
+for key, value in FUNCTIONKEY.items():
+    Reverse_Mapping[value] = key
+
+
+def detect_key_kbhit() -> Union[None, str]:
+    """
+    Convert every valid keypress to key name and return that key name
+    Default return None otherwise
+    """
+    if msvcrt.kbhit():
+        ret = ord(msvcrt.getch())
+        # print(ret)
+        if ret == 0 or ret == 224:
+            second = ord(msvcrt.getch())
+            return Reverse_Mapping[(ret, second)]
+        else:
+            return chr(ret)
+
+
+def detect_target_key_kbhit(ascii_code):
+    """
+    Check whether received keypress code is the target key's ascii code
+    """
     if msvcrt.kbhit():
         ret = ord(msvcrt.getch())
         # print(ret)
@@ -57,11 +66,29 @@ def detect_key_kbhit(ascii_code):
     return False
 
 
-def detect_key(key):
+def detect_target_key(key):
+    """
+    Loop until target_key is found
+    # When looping, it will keep yield False
+    After loop terminate, it will return True
+    """
     try:
         ascii_code = FUNCTIONKEY[key]
     except KeyError as e:
         ascii_code = [ord(key)]
-    while not detect_key_kbhit(ascii_code):
+    while not detect_target_key_kbhit(ascii_code):
         pass
     return True
+
+
+def detect_key():
+    """
+    Looping endless for detecting activate key for each pattern
+    """
+    while True:
+        curr = detect_key_kbhit()
+        if curr is not None:
+            print(curr)
+        
+    
+# detect_key()
