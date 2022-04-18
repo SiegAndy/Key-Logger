@@ -1,6 +1,4 @@
-import codecs
-from functools import partial
-import json
+import codecs, json
 from bs4 import BeautifulSoup
 
 
@@ -16,5 +14,5 @@ def get_vk_mapping():
             "virtual_key": key_code.get_text(),
         }
 
-    with open("data/key_mapping.json", "w", encoding="utf-8") as output:
+    with open("utils/key_mapping.json", "w", encoding="utf-8") as output:
         output.write(json.dumps(virtual_key_mapping, indent=4))

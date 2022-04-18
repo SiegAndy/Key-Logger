@@ -6,6 +6,8 @@ from collections import defaultdict
 from typing import Dict, List, Tuple
 from multiprocessing import Process, current_process
 
+from WindowHandler import WindowHandler
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(asctime)s: %(message)s',
                     handlers=[logging.FileHandler("keylogger.log"),
@@ -34,7 +36,7 @@ def on_press(key_combs, working_pattern):
 
 
 def on_release_prep(curr_key, key_combs: Dict[str, str], working_pattern: Dict[str, List[Tuple[Process, str]]]):
-    # print(f'Key released: {curr_key}')
+    # print(f'Key released: {int(curr_key)}')
     if curr_key == keyboard.Key[SUPER_EXIT]:
         # exit on the super exit key
         logging.info("Terminating keyboard listener. Exiting program...")
@@ -71,6 +73,10 @@ def on_release(key_combs, working_pattern):
 
 
 if __name__ == "__main__":
+    instance = WindowHandler(target_window="final fantasy")
+    # instance = WindowHandler(target_window="LOST ARK (64-bit, DX11)")
+    # instance = WindowHandler(target_window="Test")
+
     SUPER_EXIT = "f12"
     key_combs = {"f2": "f1", "f3":"f1"}
     working_pattern = defaultdict(list[Tuple[Process, str]])

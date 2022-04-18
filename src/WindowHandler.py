@@ -102,11 +102,3 @@ class WindowHandler:
 
         hwndMain = self.working_hwndMain
         pattern.execute(hwndMain)
-
-
-instance = WindowHandler(target_window="final fantasy")
-# instance = WindowHandler(target_window="LOST ARK (64-bit, DX11)")
-# instance = WindowHandler(target_window="Test")
-pa = Pattern(1)
-pa.create_pattern(["KeyPress TAB 1", "KeyPress 1 1", "Delay 2500", "KeyPress 2 1"])
-instance.execute(pa)

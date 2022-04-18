@@ -1,11 +1,180 @@
 import json, time
-from typing import Callable, List, Tuple
+import logging
+import uuid
+
+from multipledispatch import dispatch
+from typing import IO, Callable, List, Optional, Tuple
 from Logger import KeyDown, KeyUp, KeyPress, Delay
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 
 
-class Pattern:
+class stringifyable:
+    
+    category = "Stringifyable"
+
+    def stringify(self):
+
+        # print(self.__dict__)
+        result = f"[{self.category}]\n"
+        for name, value in self.__dict__.items():
+            result += f"{name.lstrip('_')}={value}\n"
+        return result
+    
+    def unstringify(self, load_string: str):
+
+        attributes = [elem for elem in load_string.split('\n') if elem]
+        if attributes[0] == f"[{self.category}]":
+            attributes = attributes[1:]
+
+        for attribute in attributes:
+            if 'uuid' in attribute.lower():
+                continue
+            key, value = attribute.split('=')
+            key = '_' + key
+            try:
+                value = int(value)
+            except:
+                pass
+            setattr(self, key, value)
+        # print(self.__dict__)
+        return self
+
+
+class KeyCombination(stringifyable):
+    """
+    key combination for start key and stop key (which start and stop the script)
+    """
+    category = "Keys"
+
+    def __init__(
+        self,
+        start_key: str = "f10",
+        stop_key: str = "f11"
+    ) -> None:
+        self._start_key = start_key
+        self._stop_key = stop_key
+
+
+    @property
+    def start_key(self):
+        return self._start_key
+
+
+    @start_key.setter
+    def start_key(self, new_start_key: str):
+        self._start_key = new_start_key
+        return self._start_key
+    
+
+    @property
+    def stop_key(self):
+        return self._stop_key
+
+
+    @stop_key.setter
+    def stop_key(self, new_stop_key: str):
+        self._stop_key = new_stop_key
+        return self._stop_key
+
+
+
+class Repeat(stringifyable):
+    """
+    Repeat type for Pattern class
+        Type I (0): start_counter, stop_counter, step => similar to Range
+        Type II (1): stop_time_interval [hr, min, sec] => stop at <hr> hour <min> minute <sec> seconds
+
+    """
+    category = "Repeat"
+
+    @dispatch()
+    def __init__(self) -> None:
+        pass
+
+    @dispatch(int, start_key=str, stop_key=str)
+    def __init__(
+        self,
+        stop_counter: int,
+    ) -> None:
+        self._type = 0
+        self._stop_counter = stop_counter
+        self._start_counter = None
+        self._step = None
+        
+
+    @dispatch(int, start_counter=int, step=int, start_key=str, stop_key=str)
+    def __init__(
+        self,
+        stop_counter: int,
+        start_counter: int = 0,
+        step: int = 1,
+    ) -> None:
+        self._type = 0
+        self._stop_counter = stop_counter
+        self._start_counter = start_counter
+        self._step = step
+
+
+    @dispatch(float, min=int, hr=int, start_key=str, stop_key=str)
+    def __init__(
+        self,
+        sec: float,
+        min: int = 0,
+        hr: int = 0,
+    ) -> None:
+        self._type = 1
+        self._sec = sec
+        self._min = min
+        self._hr = hr
+
+
+    def execute(self, func: Callable):
+        if self._type == 0:
+            if self._stop_counter < 0:
+                while True:
+                    # only stop when stop key is pressed
+                    func()
+
+            elif self._start_counter is not None:
+                # if we have a start counter
+                if self._step is not None:
+                    # if the step is set, create a for loop from range object with start, stop, step set.
+                    for i in range(
+                        self._start_counter, self._stop_counter, self._step
+                    ):
+                        func()
+                else:
+                    # if the step is not set, create a for loop from range object with start and stop set.
+                    for i in range(self._start_counter, self._stop_counter):
+                        func()
+            else:
+                # if the start counter is not set, create a for loop from range object with stop set.
+                for i in range(self._stop_counter):
+                    func()
+
+        elif self._type == 1:
+
+            timer_interval = ((self._hr * 60) + self._min * 60) + self._sec
+            start_timer = time.time()
+            end_timer = start_timer + timer_interval
+            curr_timer = start_timer
+
+            while curr_timer < end_timer:
+                func()
+                curr_timer = time.time()
+
+        else:
+            raise ValueError("Unable to execute, stop criterion not set.")
+
+        return True
+
+
+
+DEFAULTREPEAT = Repeat(1)
+DEFAULTCOMB = KeyCombination()
+
+class Pattern(stringifyable):
     """
     pattern for each key-logger event and is a list of command.
     command should be in format
@@ -17,10 +186,8 @@ class Pattern:
 
     def __init__(
         self,
-        stop_counter: int = None,
-        start_counter: int = None,
-        step: int = None,
-        stop_time_interval: Tuple[int, int, int] = None,
+        repeat: Repeat = None,
+        key_comb: KeyCombination = None,
     ) -> None:
 
         # print(start_counter, stop_counter, step, stop_time_interval)
@@ -28,40 +195,23 @@ class Pattern:
         self.reset()
         self.mapping = self.get_vk_mapping()
 
-        if stop_counter is not None:
-            # using counters as start and stop criterion for actions/pattern
-            if stop_time_interval is not None:
-                raise ValueError(
-                    "Counters and time interval attributes are mutually exclusive!"
-                )
+        self.uuid = uuid.uuid4()
 
-            self.__stop_counter = stop_counter
-            self.__start_counter = start_counter
-            if start_counter is not None:
-                # if start_counter is not None, default step is 1
-                if step is None:
-                    self.__step = 1
-                else:
-                    self.__step = step
-            else:
-                # if start_counter is None, step would be ignore even if it is passed in as a valid argument
-                self.__step = None
+        self._repeat = repeat
+        if repeat is None:
+            self._repeat = DEFAULTREPEAT
 
-        elif stop_time_interval is not None:
-            # using time interval as start and stop criterion for actions/pattern
-            self.__stop_counter = None
-            self.__stop_time_interval = stop_time_interval
-        else:
-            raise ValueError(
-                "Need either counters or time interval attributes as stop criterion!"
-            )
+        self._key_comb = key_comb
+        if key_comb is None:
+            self._key_comb = DEFAULTCOMB
 
+        
     def reset(self):
         self.pattern: List[Callable] = []
 
     @staticmethod
     def get_vk_mapping():
-        with open("data/key_mapping.json", "r", encoding="utf-8") as input:
+        with open("utils/key_mapping.json", "r", encoding="utf-8") as input:
             return json.load(input)
 
     def create_pattern(self, commands: List[str]):
@@ -123,6 +273,8 @@ class Pattern:
 
         self.reset()
 
+        self.commands = commands
+
         for command in commands:
             if not isinstance(command, str):
                 raise ValueError(
@@ -138,39 +290,49 @@ class Pattern:
             for command in self.pattern:
                 command(hwnd)
 
-        if self.__stop_counter is not None:
+        self._repeat.execute(execute_pattern())
 
-            if self.__stop_counter < 0:
-                while True:
-                    execute_pattern()
+        logging.info("\nFinished execution for pattern.")
+    
 
-            elif self.__start_counter is not None:
-                if self.__step is not None:
-                    for i in range(
-                        self.__start_counter, self.__stop_counter, self.__step
-                    ):
-                        execute_pattern()
-                else:
-                    for i in range(self.__start_counter, self.__stop_counter):
-                        execute_pattern()
-            else:
-                for i in range(self.__stop_counter):
-                    execute_pattern()
+    def stringify(self):
+        general = self._key_comb.stringify()
+        general += f"UUID={self.uuid}\n"
+        repeat = self._repeat.stringify()
+        script = "[Script]\n"
+        for command in self.commands:
+            script += f"{command}\n"
+        
+        return general + repeat + script
 
-        elif self.__stop_time_interval is not None:
+    
+    def unstringify(self, load_string: str):
+        # split on Repeat object's category flag
+        general, repeat_script = load_string.split(f"[{DEFAULTREPEAT.category}]")
 
-            hr, min, sec = self.__stop_time_interval
-            timer_interval = ((hr * 60) + min * 60) + sec
-            start_timer = time.time()
-            end_timer = start_timer + timer_interval
-            curr_timer = start_timer
+        # retrieve uuid from string
+        self.uuid = [elem for elem in general.split('\n') if elem][-1].split('=')[1]
 
-            while curr_timer < end_timer:
-                execute_pattern()
-                curr_timer = time.time()
+        # retrieve key combination from string
+        self._key_comb = KeyCombination().unstringify(general)
 
-        else:
-            raise ValueError("Unable to execute, stop criterion not set.")
+        # split on script's category flag
+        repeat, script = repeat_script.split("[Script]")
 
-        print("\nFinished execution for pattern. Exiting...")
-        exit(0)
+        # retrieve repeat style from string
+        self._repeat = Repeat().unstringify(repeat)
+
+        # retrieve commands from string
+        commands = [elem for elem in script.split("\n") if elem]
+
+        # create pattern according to commands
+        self.create_pattern(commands)
+
+        return self
+
+    def unstringifyf(self, fd: IO):
+        """
+        unstringify a Pattern object directly from file descriptor
+        """
+        pass
+    
