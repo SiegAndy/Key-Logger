@@ -22,7 +22,7 @@ mapping = {
     },
     "test":{
         "script_path": ["root", "default"],
-        "window_name": "Test"
+        "window_name": "main"
     }
 }
 
