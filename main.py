@@ -38,7 +38,8 @@ def startup(map_token: str):
 if __name__ == "__main__":
     # logging.info(uuid4())
     logging.info("Starting Main Program...")
-    scripts, instance = startup(map_token="lost ark")
+    # scripts, instance = startup(map_token="lost ark")
+    scripts, instance = startup(map_token="ff14")
     
     logging.info("Starting Keypress reading...")
     # Collect events until released

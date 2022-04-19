@@ -1,6 +1,6 @@
 [Keys]
-start_key=f8
-stop_key=f1
+start_key=f4
+stop_key=f3
 name=confirm
 uuid=f6f0a9db-9b94-44b5-a094-359cdb6a3312
 [Repeat]
