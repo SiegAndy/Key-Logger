@@ -1,12 +1,13 @@
-import json, time
-import logging
+import time, logging
 from uuid import UUID, uuid4
 from multipledispatch import dispatch
-from typing import IO, Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List
 from Logger import KeyDown, KeyUp, KeyPress, Delay
 from utils import mapping
 
+
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
+
 
 def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
     # print(input_dict)
@@ -77,6 +78,10 @@ class KeyCombination(stringifyable):
     key combination for start key and stop key (which start and stop the script)
     """
     category = "Keys"
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
     def __init__(
         self,

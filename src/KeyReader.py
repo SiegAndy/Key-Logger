@@ -6,6 +6,8 @@ from collections import defaultdict
 from typing import Callable, Dict, List, Tuple
 from multiprocessing import Process, current_process
 
+from Script import Script
+
 SUPER_EXIT = 'f12'
 
 def dummy_func():
@@ -18,18 +20,26 @@ def dummy_func():
     logging.info(f"{name} finished")
 
 
-def on_press_prep(curr_key, exec_func: Callable, key_combs: Dict[str, str], working_pattern: Dict[str, List[Tuple[Process, str]]]):
+def on_press_prep(curr_key, exec_func: Callable, scripts: Script):
     try:
         curr_char = curr_key.char
         # print(f'Alphanumeric key pressed: {curr_char}')
     except AttributeError:
         # print(f'special key pressed: {curr_key}')
         pass
-def on_press(exec_func: Callable, key_combs, working_pattern):
-    return partial(on_press_prep, exec_func=exec_func, key_combs=key_combs, working_pattern=working_pattern)
+def on_press(exec_func: Callable, scripts: Script):
+    return partial(on_press_prep, exec_func=exec_func, scripts=scripts)
 
 
-def on_release_prep(curr_key, exec_func: Callable, key_combs: Dict[str, str], working_pattern: Dict[str, List[Tuple[Process, str]]]):
+def on_release_prep(curr_key, exec_func: Callable, scripts: Script):
+    """
+    scripts should be a initialized Script object which have two sets: acting and resting scripts.
+
+    Query start_key or stop_key from scripts would transfer script from one set to another.
+
+    Each script would be a Pattern object, which should be passed in as argument to exec_func
+
+    """
     # print(f'Key released: {int(curr_key)}')
     if curr_key == keyboard.Key[SUPER_EXIT]:
         # exit on the super exit key
@@ -44,27 +54,31 @@ def on_release_prep(curr_key, exec_func: Callable, key_combs: Dict[str, str], wo
         curr_key = str(curr_key).split('.')[1]
         # print(f'special key pressed: {curr_key}')
 
-    if curr_key in key_combs.keys():
-        # current key is one of start key
-        stop_key = key_combs.pop(curr_key)
-        # stop_key_reader = Process(target=detect_target_key, args=[stop_key], daemon=True, name=f"KeyReader_{curr}_{stop_key}")
-        dummy = Process(target=exec_func, args=[], daemon=True, name=f"dummy_{curr_key}_{stop_key}")
-        dummy.start()
-        working_pattern[stop_key].append((dummy, curr_key))
+    # find patterns that current key is served as start key
+    start_set = scripts.find_pattern_with_key(start_key=curr_key)
+    # find patterns that current key is served as stop key
+    stop_set = scripts.find_pattern_with_key(stop_key=curr_key)
 
-    if curr_key in working_pattern.keys():
-        # current key is one of stop key
-            need_to_stop = working_pattern.pop(curr_key)
-            for process, start_key in need_to_stop:
-                if process.is_alive():
-                    process.terminate()
-                else:
-                    process.close()
-                logging.info(f"{process.name} terminated. start key: {start_key}, stop key:{curr_key}")
-                key_combs[start_key] = curr_key
+    for curr_start_key, curr_stop_key, start_pattern in start_set:
+        process_name = start_pattern.name
+        process_id = start_pattern.uuid
+        curr_process = Process(target=exec_func, args=[start_pattern], daemon=True, name=f"{process_name}_{curr_start_key}_{curr_stop_key}")
+        logging.info(f"{curr_process.name} started. start key: {curr_start_key}, stop key:{curr_stop_key}")
+        curr_process.start()
+        scripts.add_process(process_id=process_id, new_process=curr_process)
+    
+    for curr_start_key, curr_stop_key, stop_pattern in stop_set:
+        process_id = stop_pattern.uuid
+        need_to_stop_process = scripts.remove_process(process_id=process_id)
+        if need_to_stop_process.is_alive():
+            need_to_stop_process.terminate()
+        else:
+            need_to_stop_process.close()
+        logging.info(f"{need_to_stop_process.name} terminated. start key: {curr_start_key}, stop key:{curr_stop_key}")
 
-def on_release(exec_func: Callable, key_combs, working_pattern):
-    return partial(on_release_prep, exec_func=exec_func, key_combs=key_combs, working_pattern=working_pattern)
+
+def on_release(exec_func: Callable, scripts: Script):
+    return partial(on_release_prep, exec_func=exec_func, scripts=scripts)
 
 
 

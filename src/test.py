@@ -1,3 +1,4 @@
+from re import A
 from Pattern import Repeat, Pattern
 
 
@@ -42,10 +43,15 @@ a = {
         '2':{
             '3':4
         }
-    }
+    },
+    '2':2
 }
 
-b = a['1']['2']['3']
-print(b)
-b = 5
-print(a, b)
+# b = a['1']['2']['3']
+# print(b)
+# b = 5
+# print(a, b)
+b = a
+
+b.pop(['1','2'])
+print(a)

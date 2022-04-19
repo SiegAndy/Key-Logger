@@ -7,6 +7,7 @@ from multiprocessing import Process
 from pynput import keyboard
 from KeyReader import dummy_func, on_press, on_release
 from Pattern import Pattern
+from Script import Script
 from WindowHandler import WindowHandler
 from utils import find_or_create_scripts_folder, klp_to_dict
 
@@ -18,7 +19,11 @@ logging.basicConfig(level=logging.DEBUG,
                               logging.StreamHandler()])
 
 if __name__ == "__main__":
-    pass
+    scripts = Script()
+    scripts.retrieve_scripts(["root", "default"])
+    result = scripts.find_pattern_with_key(start_key='f10')
+    print(scripts._acting_scripts, scripts._resting_scripts)
+    print(result)
 
     # instance = WindowHandler(target_window="final fantasy")
     # instance = WindowHandler(target_window="LOST ARK (64-bit, DX11)")
