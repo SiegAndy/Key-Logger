@@ -1,0 +1,15 @@
+[Keys]
+start_key=f3
+stop_key=f1
+name=S-G-4sec
+uuid=c675f92a-58bd-4c5c-bf74-721120d407ae
+[Repeat]
+type=0
+stop_counter=-1
+start_counter=0
+step=1
+[Script]
+KeyPress S 3
+Delay 4000
+KeyPress G 3
+Delay 4000

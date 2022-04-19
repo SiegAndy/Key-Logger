@@ -1,0 +1,13 @@
+[Keys]
+start_key=f8
+stop_key=f1
+name=anti-kick
+uuid=67e64827-fa12-4ba8-92d7-0cea415323d6
+[Repeat]
+type=0
+stop_counter=-1
+start_counter=0
+step=1
+[Script]
+KeyPress C 1
+Delay 600000

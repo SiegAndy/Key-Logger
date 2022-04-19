@@ -1,13 +1,9 @@
-import logging, os
-from collections import defaultdict
-from typing import DefaultDict, Dict, List, Tuple
-from multiprocessing import Process
+import logging
+from uuid import uuid4
 from pynput import keyboard
-from KeyReader import dummy_func, on_press, on_release
-from Pattern import Pattern
+from KeyReader import on_press, on_release
 from Script import Script
 from WindowHandler import WindowHandler
-from utils import find_or_create_scripts_folder, klp_to_dict
 
 
 logging.basicConfig(
@@ -16,20 +12,36 @@ logging.basicConfig(
     handlers=[logging.FileHandler("keylogger.log"), logging.StreamHandler()],
 )
 
-if __name__ == "__main__":
+
+mapping = {
+    "ff14": {
+        "script_path": ["root", "FFIV"],
+        "window_name": "final fantasy"
+    },
+    "lost ark": {
+        "script_path": ["root", "Lost Ark"],
+        "window_name": "LOST ARK (64-bit, DX11)"
+    },
+    "test":{
+        "script_path": ["root", "default"],
+        "window_name": "Test"
+    }
+}
+
+
+def startup(map_token: str):
+    target = mapping[map_token]
     scripts = Script()
-    scripts.retrieve_scripts(["root", "default"])
-    # result = scripts.find_pattern_with_key(start_key='f10')
-    # print(scripts._acting_scripts, scripts._resting_scripts)
-    # print(result)
-    # print("pass")
+    scripts.retrieve_scripts(target["script_path"])
+    instance = WindowHandler(target_window=target["window_name"])
+    return scripts, instance
 
-    instance = WindowHandler(target_window="final fantasy")
-    # instance = WindowHandler(target_window="LOST ARK (64-bit, DX11)")
-    # instance = WindowHandler(target_window="Test")
-
-    # key_combs = {"f2": "f1", "f3":"f1"}
-    # working_pattern = defaultdict(list[Tuple[Process, str]])
+if __name__ == "__main__":
+    logging.info(uuid4())
+    logging.info("Starting Main Program...")
+    scripts, instance = startup(map_token="ff14")
+    
+    logging.info("Starting Keypress reading...")
     # Collect events until released
     with keyboard.Listener(
         on_press=on_press(instance.execute, scripts),

@@ -160,38 +160,38 @@ mapping = {
     "Select Media": {"alias": "VK_LAUNCH_MEDIA_SELECT", "virtual_key": "0xB5"},
     "Start Application 1": {"alias": "VK_LAUNCH_APP1", "virtual_key": "0xB6"},
     "Start Application 2": {"alias": "VK_LAUNCH_APP2", "virtual_key": "0xB7"},
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ';:'": {
+    ";:": {
         "alias": "VK_OEM_1",
         "virtual_key": "0xBA",
     },
-    "For any country/region, the '+'": {"alias": "VK_OEM_PLUS", "virtual_key": "0xBB"},
-    "For any country/region, the ','": {"alias": "VK_OEM_COMMA", "virtual_key": "0xBC"},
-    "For any country/region, the '-'": {"alias": "VK_OEM_MINUS", "virtual_key": "0xBD"},
-    "For any country/region, the '.'": {
+    "+": {"alias": "VK_OEM_PLUS", "virtual_key": "0xBB"},
+    ",": {"alias": "VK_OEM_COMMA", "virtual_key": "0xBC"},
+    "-": {"alias": "VK_OEM_MINUS", "virtual_key": "0xBD"},
+    ".": {
         "alias": "VK_OEM_PERIOD",
         "virtual_key": "0xBE",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '/?'": {
+    "/?": {
         "alias": "VK_OEM_2",
         "virtual_key": "0xBF",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '`~'": {
+    "`~": {
         "alias": "VK_OEM_3",
         "virtual_key": "0xC0",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '[{'": {
+    "[{": {
         "alias": "VK_OEM_4",
         "virtual_key": "0xDB",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the '\\|'": {
+    "\\|": {
         "alias": "VK_OEM_5",
         "virtual_key": "0xDC",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the ']}'": {
+    "]}": {
         "alias": "VK_OEM_6",
         "virtual_key": "0xDD",
     },
-    "Used for miscellaneous characters; it can vary by keyboard. For the US standard keyboard, the 'single-quote/double-quote'": {
+    "single-quote/double-quote": {
         "alias": "VK_OEM_7",
         "virtual_key": "0xDE",
     },
