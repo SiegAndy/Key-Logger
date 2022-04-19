@@ -9,5 +9,5 @@ stop_counter=-1
 start_counter=0
 step=1
 [Script]
-KeyPress G 1
-Delay 4000
+KeyPress C 1
+Delay 500

@@ -1,9 +1,10 @@
+import json
 import time, logging
 from uuid import UUID, uuid4
 from multipledispatch import dispatch
 from typing import Callable, Dict, List
-from Logger import KeyDown, KeyUp, KeyPress, Delay
-from utils import mapping
+from src.Logger import KeyDown, KeyUp, KeyPress, Delay
+from src.utils import mapping
 
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
@@ -191,6 +192,9 @@ class Repeat(stringifyable):
             raise ValueError("Unable to execute, stop criterion not set.")
 
         return True
+    
+    def __repr__(self) -> str:
+        return json.dumps(self.toDict(), indent=4)
 
 
 DEFAULTREPEAT = Repeat(1)

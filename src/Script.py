@@ -1,11 +1,10 @@
-import logging
+import logging, os
 from multiprocessing import Process
-import os
 from typing import Dict, List, Tuple
 from uuid import UUID
-from Pattern import Pattern
-from Presets import DEFAULT, create_presets
-from utils import find_or_create_scripts_folder, klp_to_dict
+from src.utils import find_or_create_scripts_folder, klp_to_dict
+from src.Pattern import Pattern
+from src.Presets import DEFAULT, create_presets
 
 
 class MutuallyExclusiveError(Exception):

@@ -2,7 +2,7 @@
 start_key=f10
 stop_key=f11
 name=default_pattern_0
-uuid=316eb67c-dfeb-4b0e-bea2-4e21172dda20
+uuid=316eb77c-dfeb-4b0e-bea2-4e21172dda20
 [Repeat]
 type=0
 stop_counter=1

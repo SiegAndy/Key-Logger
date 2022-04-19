@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import Callable, Dict, List, Tuple
 from multiprocessing import Process, current_process
 
-from Script import Script
+from src.Script import Script
 
 SUPER_EXIT = "f12"
 

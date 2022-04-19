@@ -1,7 +1,7 @@
 import logging
 import win32gui, win32process, win32con, win32api
 from typing import List
-from Pattern import Pattern
+from src.Pattern import Pattern
 
 
 class WindowHandler:

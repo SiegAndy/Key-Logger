@@ -9,7 +9,7 @@ stop_counter=-1
 start_counter=0
 step=1
 [Script]
-KeyPress S 3
+KeyPress S 1
 Delay 4000
-KeyPress G 3
+KeyPress G 1
 Delay 4000
