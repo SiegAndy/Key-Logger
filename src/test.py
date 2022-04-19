@@ -21,7 +21,7 @@ from Pattern import Repeat, Pattern
 #             "attribute_1": "value_1",
 #             "attribute_2": "value_2",
 #         },
-        
+
 #     }
 # dict_to_klp("test", dummy)
 # result = klp_to_dict("src/scripts/test.klp")
@@ -38,14 +38,7 @@ from Pattern import Repeat, Pattern
 # print(pa.toDict())
 # print(result == pa.toDict())
 
-a = {
-    '1':{
-        '2':{
-            '3':4
-        }
-    },
-    '2':2
-}
+a = {"1": {"2": {"3": 4}}, "2": 2}
 
 # b = a['1']['2']['3']
 # print(b)
@@ -53,5 +46,5 @@ a = {
 # print(a, b)
 b = a
 
-b.pop(['1','2'])
+b.pop(["1", "2"])
 print(a)

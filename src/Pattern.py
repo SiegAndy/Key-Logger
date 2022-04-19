@@ -12,9 +12,9 @@ Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
     # print(input_dict)
     for attribute, value in input_dict.items():
-        if 'uuid' in attribute.lower():
+        if "uuid" in attribute.lower():
             continue
-        key = '_' + attribute
+        key = "_" + attribute
         try:
             value = int(value)
         except:
@@ -25,7 +25,7 @@ def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
 
 
 class stringifyable:
-    
+
     category = "Stringifyable"
 
     @dispatch()
@@ -39,18 +39,18 @@ class stringifyable:
         for name, value in self.__dict__.items():
             result += f"{name.lstrip('_')}={value}\n"
         return result
-    
+
     def unstringify(self, load_string: str):
 
-        attributes = [elem for elem in load_string.split('\n') if elem]
+        attributes = [elem for elem in load_string.split("\n") if elem]
         if attributes[0] == f"[{self.category}]":
             attributes = attributes[1:]
 
         for attribute in attributes:
-            if 'uuid' in attribute.lower():
+            if "uuid" in attribute.lower():
                 continue
-            key, value = attribute.split('=')
-            key = '_' + key
+            key, value = attribute.split("=")
+            key = "_" + key
             try:
                 value = int(value)
             except:
@@ -58,12 +58,12 @@ class stringifyable:
             setattr(self, key, value)
         # print(self.__dict__)
         return self
-    
+
     def toDict(self):
         result = dict()
         result[self.category] = dict()
         for name, value in self.__dict__.items():
-            result[self.category][name.lstrip('_')] = value
+            result[self.category][name.lstrip("_")] = value
         # print(result)
         return result
 
@@ -77,36 +77,28 @@ class KeyCombination(stringifyable):
     """
     key combination for start key and stop key (which start and stop the script)
     """
+
     category = "Keys"
 
     def __getitem__(self, item):
         return getattr(self, item)
 
-
-    def __init__(
-        self,
-        start_key: str = "f10",
-        stop_key: str = "f11"
-    ) -> None:
+    def __init__(self, start_key: str = "f10", stop_key: str = "f11") -> None:
         self._start_key = start_key
         self._stop_key = stop_key
-
 
     @property
     def start_key(self):
         return self._start_key
 
-
     @start_key.setter
     def start_key(self, new_start_key: str):
         self._start_key = new_start_key
         return self._start_key
-    
 
     @property
     def stop_key(self):
         return self._stop_key
-
 
     @stop_key.setter
     def stop_key(self, new_stop_key: str):
@@ -121,6 +113,7 @@ class Repeat(stringifyable):
         Type II (1): stop_time_interval [hr, min, sec] => stop at <hr> hour <min> minute <sec> seconds
 
     """
+
     category = "Repeat"
 
     @dispatch()
@@ -136,7 +129,6 @@ class Repeat(stringifyable):
         self._stop_counter = stop_counter
         self._start_counter = None
         self._step = None
-        
 
     @dispatch(int, start_counter=int, step=int, start_key=str, stop_key=str)
     def __init__(
@@ -150,7 +142,6 @@ class Repeat(stringifyable):
         self._start_counter = start_counter
         self._step = step
 
-
     @dispatch(float, min=int, hr=int, start_key=str, stop_key=str)
     def __init__(
         self,
@@ -163,7 +154,6 @@ class Repeat(stringifyable):
         self._min = min
         self._hr = hr
 
-
     def execute(self, func: Callable):
         if self._type == 0:
             if self._stop_counter < 0:
@@ -175,9 +165,7 @@ class Repeat(stringifyable):
                 # if we have a start counter
                 if self._step is not None:
                     # if the step is set, create a for loop from range object with start, stop, step set.
-                    for i in range(
-                        self._start_counter, self._stop_counter, self._step
-                    ):
+                    for i in range(self._start_counter, self._stop_counter, self._step):
                         func()
                 else:
                     # if the step is not set, create a for loop from range object with start and stop set.
@@ -205,10 +193,10 @@ class Repeat(stringifyable):
         return True
 
 
-
 DEFAULTREPEAT = Repeat(1)
 DEFAULTCOMB = KeyCombination()
 SCRIPT = "Script"
+
 
 class Pattern(stringifyable):
     """
@@ -219,11 +207,10 @@ class Pattern(stringifyable):
         pattern is like ["KeyDown C", "Delay 10", "KeyUp C", "Delay 1000", "KeyPress C 3"]
         it means: press C down for 10 msec and relase C, delay 1000msec (1sec) and then press and release C for three times.
     """
-    
+
     @dispatch()
     def __init__(self) -> None:
         self.reset()
-
 
     @dispatch(str, repeat=Repeat, key_comb=KeyCombination)
     def __init__(
@@ -249,7 +236,7 @@ class Pattern(stringifyable):
     @property
     def repeat(self) -> Repeat:
         return self._repeat
-    
+
     @property
     def key_comb(self) -> KeyCombination:
         return self._key_comb
@@ -257,25 +244,24 @@ class Pattern(stringifyable):
     @property
     def name(self) -> str:
         return self._name
-    
+
     @name.setter
     def name(self, new_name: str) -> str:
         self._name = new_name
         return self._name
-    
+
     @property
     def uuid(self) -> UUID:
         return self._uuid
-    
+
     @uuid.setter
     def uuid(self, new_uuid: UUID) -> UUID:
         self._uuid = new_uuid
         return self._uuid
-        
+
     def reset(self):
         self.pattern: List[Callable] = []
         self.mapping = mapping
-
 
     def create_pattern(self, commands: List[str]):
         def create_keyboard_command(action, key, num):
@@ -347,17 +333,18 @@ class Pattern(stringifyable):
 
         return self.pattern
 
-
     def execute(self, hwnd):
         def execute_pattern():
-            print(self.pattern)
+            # print(self.pattern)
             for command in self.pattern:
                 command(hwnd)
 
-        self._repeat.execute(execute_pattern())
+        # print(self._repeat)
+        self._repeat.execute(execute_pattern)
 
-        logging.info("\nFinished execution for pattern.")
-    
+        logging.info(
+            f"Finished execution for pattern: {self._name}_{self._key_comb.start_key}_{self._key_comb.stop_key}"
+        )
 
     def stringify(self):
         general = self._key_comb.stringify()
@@ -367,16 +354,15 @@ class Pattern(stringifyable):
         script = "[Script]\n"
         for command in self.commands:
             script += f"{command}\n"
-        
+
         return general + repeat + script
 
-    
     def unstringify(self, load_string: str):
         # split on Repeat object's category flag
         general, repeat_script = load_string.split(f"[{DEFAULTREPEAT.category}]")
 
         # retrieve uuid from string
-        self._uuid = [elem for elem in general.split('\n') if elem][-1].split('=')[1]
+        self._uuid = [elem for elem in general.split("\n") if elem][-1].split("=")[1]
 
         # retrieve key combination from string
         self._key_comb = KeyCombination().unstringify(general)
@@ -408,7 +394,7 @@ class Pattern(stringifyable):
 
         if self.commands is not None:
             pattern[SCRIPT] = self.commands
-        
+
         return pattern
 
     @classmethod
@@ -427,9 +413,9 @@ class Pattern(stringifyable):
         key_comb = KeyCombination.fromDict(input_dict=general)
         setattr(cls, "_key_comb", key_comb)
 
-        repeat = KeyCombination.fromDict(input_dict=repeat)
+        repeat = Repeat.fromDict(input_dict=repeat)
         setattr(cls, "_repeat", repeat)
-        
+
         # print(scripts)
         if scripts is not None:
             cls.create_pattern(scripts)

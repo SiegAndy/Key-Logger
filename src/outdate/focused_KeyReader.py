@@ -89,6 +89,6 @@ def detect_key():
         curr = detect_key_kbhit()
         if curr is not None:
             print(curr)
-        
-    
+
+
 # detect_key()

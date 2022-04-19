@@ -1,16 +1,27 @@
-
-
 import os
 from typing import Dict, List
 from Pattern import Pattern
-from utils import create_directory, dict_to_klp, find_or_create_scripts_folder, klp_to_dict
+from utils import (
+    create_directory,
+    dict_to_klp,
+    find_or_create_scripts_folder,
+    klp_to_dict,
+)
 
 
 DEFAULT = "default"
 
 preset_commands = [
-    ["KeyPress TAB 1", "KeyPress 1 1", "Delay 2500", "KeyPress 2 1", "Delay 2500", "KeyPress 3 1"]
+    [
+        "KeyPress TAB 1",
+        "KeyPress 1 1",
+        "Delay 2500",
+        "KeyPress 2 1",
+        "Delay 2500",
+        "KeyPress 3 1",
+    ]
 ]
+
 
 def create_presets(presets: List[List[str]] = preset_commands):
 
@@ -22,9 +33,6 @@ def create_presets(presets: List[List[str]] = preset_commands):
         pattern.create_pattern(preset)
         filename = os.path.join(DEFAULT, pattern.name)
         dict_to_klp(filename, pattern.toDict())
-
-
-
 
 
 if __name__ == "__main__":

@@ -11,7 +11,6 @@ It accepts dictionary or object.__dict__ to be converted as specific format of s
 """
 
 
-
 class FormatError(Exception):
     pass
 
@@ -38,7 +37,7 @@ def dict_to_klp(filename: str, object: Dict[Any, dict], indent: int = 0):
 
     return klp string
     """
-    
+
     indent = " " * indent
     contents = ""
     for category, elements in object.items():
@@ -51,8 +50,10 @@ def dict_to_klp(filename: str, object: Dict[Any, dict], indent: int = 0):
                 contents += f"{indent}{attribute}={value}\n"
 
     script_path = find_or_create_scripts_folder()
-    
-    with open(os.path.join(script_path, f"{filename}.klp"), 'w', encoding='utf-8') as klp:
+
+    with open(
+        os.path.join(script_path, f"{filename}.klp"), "w", encoding="utf-8"
+    ) as klp:
         klp.write(contents)
 
     return contents
@@ -77,7 +78,7 @@ def klp_to_dict(filename: str):
     re_category = re.compile(category_pattern)
     re_attribute = re.compile(attribute_pattern)
 
-    with open(filename, 'r', encoding='utf-8') as input:
+    with open(filename, "r", encoding="utf-8") as input:
 
         contents = input.readlines()
         result_dict: Dict[str, Union[Dict, List]] = dict()
@@ -87,11 +88,14 @@ def klp_to_dict(filename: str):
         for line in contents:
             if line is None:
                 continue
-            
-            line = line.strip('\n')
-            if current_category is not None and "script" not in current_category.lower():
+
+            line = line.strip("\n")
+            if (
+                current_category is not None
+                and "script" not in current_category.lower()
+            ):
                 # remove indents which are whitespace for every non-script section
-                line = [elem for elem in line.split(' ') if elem][0]
+                line = [elem for elem in line.split(" ") if elem][0]
 
             attribute_value = re_attribute.match(line)
             category = re_category.match(line)
@@ -100,7 +104,9 @@ def klp_to_dict(filename: str):
             if attribute_value is not None:
                 # means it is a attribute string
                 if current_category is None:
-                    raise FormatError("You must first have a category and then assign attribute!")
+                    raise FormatError(
+                        "You must first have a category and then assign attribute!"
+                    )
 
                 attribute, value = attribute_value.group(1), attribute_value.group(2)
                 result_dict[current_category][attribute] = value
@@ -121,6 +127,5 @@ def klp_to_dict(filename: str):
             else:
                 print(is_script)
                 raise ValueError(f"Unable to identify line: '{line}'")
-                
-    
+
     return result_dict

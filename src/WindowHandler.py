@@ -1,3 +1,4 @@
+import logging
 import win32gui, win32process, win32con, win32api
 from typing import List
 from Pattern import Pattern
@@ -100,5 +101,6 @@ class WindowHandler:
                 0,
             )
 
+        # logging.warn("WindowHandler is working")
         hwndMain = self.working_hwndMain
         pattern.execute(hwndMain)

@@ -16,7 +16,9 @@ def find_file(filename: str, default_dir: str = None, up=0) -> str:
             return result
         else:
             if up != 0:
-                return find_file(filename=filename, default_dir=default_dir, up=(up - 1))
+                return find_file(
+                    filename=filename, default_dir=default_dir, up=(up - 1)
+                )
             for root, dirs, files in os.walk("."):
                 for file in files:
                     if file == filename:
@@ -31,8 +33,8 @@ def find_dir(dir_name: str, up: int = 0, walking_path: str = ".") -> str:
     result = os.path.isdir(dir_name)
     if not result:
         if up > 0:
-            if walking_path == '.':
-                walking_path = os.path.join("..","")
+            if walking_path == ".":
+                walking_path = os.path.join("..", "")
             else:
                 walking_path = os.path.join("..", walking_path)
             return find_dir(dir_name=dir_name, up=(up - 1), walking_path=walking_path)
@@ -46,12 +48,20 @@ def find_dir(dir_name: str, up: int = 0, walking_path: str = ".") -> str:
         raise FileNotFoundError(f"Unable to find {dir_name} in current directory.")
     return dir_name
 
-print( )
+
+print()
+
+
 def reformat_directory(target_dir: str):
     """
     reformat directory name with current system's seperator
     """
-    without_slash = [inner for outter in target_dir.split('\\') for inner in outter.split('/') if inner]
+    without_slash = [
+        inner
+        for outter in target_dir.split("\\")
+        for inner in outter.split("/")
+        if inner
+    ]
     return os.path.join(*without_slash)
 
 
@@ -61,12 +71,12 @@ def check_directory(target_dir: str, compare_dir: str = os.getcwd()) -> bool:
     """
     target_dir = reformat_directory(target_dir)
     compare_dir = reformat_directory(compare_dir)
-    
+
     if len(target_dir) > len(compare_dir):
         # no way that target_dir has longer length while still be part of compare_dir
         return False
-    
-    if compare_dir[-len(target_dir):] == target_dir:
+
+    if compare_dir[-len(target_dir) :] == target_dir:
         # if target_dir match the last len(target_dir) character return True
         return True
 
