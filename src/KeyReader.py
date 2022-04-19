@@ -94,6 +94,12 @@ def on_release_prep(curr_key, exec_func: Callable, scripts: Script):
     for curr_start_key, curr_stop_key, stop_pattern in stop_set:
         process_id = stop_pattern.uuid
         need_to_stop_process = scripts.remove_process(process_id=process_id)
+        if need_to_stop_process is None:
+            logging.info(
+                f"{process_id} cannot be terminated. Unable to find process according to id."
+            )
+            return 
+
         if need_to_stop_process.is_alive():
             need_to_stop_process.terminate()
         else:

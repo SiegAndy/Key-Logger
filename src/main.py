@@ -24,9 +24,9 @@ if __name__ == "__main__":
     # print(result)
     # print("pass")
 
-    # instance = WindowHandler(target_window="final fantasy")
+    instance = WindowHandler(target_window="final fantasy")
     # instance = WindowHandler(target_window="LOST ARK (64-bit, DX11)")
-    instance = WindowHandler(target_window="Test")
+    # instance = WindowHandler(target_window="Test")
 
     # key_combs = {"f2": "f1", "f3":"f1"}
     # working_pattern = defaultdict(list[Tuple[Process, str]])

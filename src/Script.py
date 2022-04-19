@@ -184,6 +184,7 @@ class Script:
         process_id should be Pattern.uuid
         """
         self._working_process[process_id] = new_process
+        logging.info(self._working_process)
 
     def remove_process(self, process_id: UUID) -> Process:
         """
@@ -191,4 +192,9 @@ class Script:
 
         process_id should be Pattern.uuid
         """
-        return self._working_process.pop(process_id)
+        try:
+            return self._working_process.pop(process_id)
+        except KeyError as e:
+            # Error could happen when process is already ended and removed but listener thread does not aware of it
+            logging.warn(f"Missing key: {process_id}")
+            return None

@@ -1,0 +1,13 @@
+[Keys]
+start_key=f9
+stop_key=f10
+name=default_pattern_0
+uuid=316eb67c-dfeb-4b0e-bea2-4e21172dda20
+[Repeat]
+type=0
+stop_counter=-1
+start_counter=0
+step=1
+[Script]
+KeyPress A 1
+Delay 500
