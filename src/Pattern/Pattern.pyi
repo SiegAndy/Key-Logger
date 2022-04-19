@@ -26,17 +26,13 @@ class Repeat(stringifyable):
     @property
     def stop_time_interval(self) -> Tuple[int, int, int]: ...
     @overload
-    def __init__(
-        self, stop_counter: int, start_key: str = "f10", stop_key: str = "f11"
-    ) -> None: ...
+    def __init__(self, stop_counter: int) -> None: ...
     @overload
     def __init__(
         self,
         stop_counter: int,
         start_counter: int = 0,
         step: int = 1,
-        start_key: str = "f10",
-        stop_key: str = "f11",
     ) -> None: ...
     @overload
     def __init__(
@@ -44,8 +40,6 @@ class Repeat(stringifyable):
         sec: float,
         min: int = 0,
         hr: int = 0,
-        start_key: str = "f10",
-        stop_key: str = "f11",
     ) -> None: ...
 
 class Pattern(stringifyable):

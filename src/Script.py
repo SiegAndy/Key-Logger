@@ -183,7 +183,7 @@ class Script:
         process_id should be Pattern.uuid
         """
         self._working_process[process_id] = new_process
-        logging.info(self._working_process)
+        # logging.info(self._working_process)
 
     def remove_process(self, process_id: UUID) -> Process:
         """
