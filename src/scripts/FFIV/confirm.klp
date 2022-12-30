@@ -1,6 +1,6 @@
 [Keys]
-start_key=f4
-stop_key=f3
+start_key=f6
+stop_key=f5
 name=confirm
 uuid=f6f0a9db-9b94-44b5-a094-359cdb6a3312
 [Repeat]
@@ -10,4 +10,4 @@ start_counter=0
 step=1
 [Script]
 KeyPress , 1
-Delay 500
+Delay 60000

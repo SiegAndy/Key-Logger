@@ -1,0 +1,21 @@
+[Keys]
+start_key=f2
+stop_key=f1
+name=TwoStepALM
+uuid=d16e6e90-ad96-411e-9364-d97f39c320ff
+[Repeat]
+type=0
+stop_counter=-1
+start_counter=0
+step=1
+[Script]
+KeyPress Num_0 1
+Delay 200
+KeyPress Num_0 1
+Delay 200
+KeyPress Num_0 1
+Delay 2000
+KeyPress 0 1
+Delay 51000
+KeyPress - 1
+Delay 17000

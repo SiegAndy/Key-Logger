@@ -1,0 +1,23 @@
+[Keys]
+start_key=f5
+stop_key=f1
+name=Farm-Mines
+uuid=67e64827-fa12-4ba8-92d7-0cea415323d6
+[Repeat]
+type=0
+stop_counter=-1
+start_counter=0
+step=1
+[Script]
+KeyDown Alt 1
+Delay 500
+KeyUp Alt 1
+Delay 1000
+KeyPress E 3
+Delay 200
+KeyPress E 3
+Delay 200
+KeyPress E 3
+Delay 200
+KeyPress E 3
+Delay 200

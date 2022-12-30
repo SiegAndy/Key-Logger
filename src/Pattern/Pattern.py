@@ -8,6 +8,7 @@ from src.utils import mapping
 
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
+Actions = ["KeyDown", "KeyUp", "KeyPress", "Delay"]
 
 
 def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
@@ -192,7 +193,7 @@ class Repeat(stringifyable):
             raise ValueError("Unable to execute, stop criterion not set.")
 
         return True
-    
+
     def __repr__(self) -> str:
         return json.dumps(self.toDict(), indent=4)
 
@@ -268,9 +269,9 @@ class Pattern(stringifyable):
         self.mapping = mapping
 
     def create_pattern(self, commands: List[str]):
-        def create_keyboard_command(action, key, num):
+        def create_keyboard_command(action: str, key: str, num: str):
             try:
-                curr_vk = self.mapping[key]
+                curr_vk = self.mapping[key.upper()]
                 curr_vk = curr_vk["virtual_key"]
                 num = int(num)
             except KeyError:
@@ -323,6 +324,10 @@ class Pattern(stringifyable):
                         f"Required arguments number: 2, but {len_command} received"
                     )
                 return create_delay_command(msec=command)
+            print(command)
+            raise ValueError(
+                f"Unexpected action detected: {action}. Accepted Actions are: {Actions}"
+            )
 
         self.reset()
 

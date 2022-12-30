@@ -1,7 +1,7 @@
 [Keys]
-start_key=f5
+start_key=f4
 stop_key=f1
-name=G-4sec
+name=OneStep
 uuid=d16e6e90-ad96-411e-9364-d97f39c320ff
 [Repeat]
 type=0
@@ -9,5 +9,11 @@ stop_counter=-1
 start_counter=0
 step=1
 [Script]
-KeyPress 6 3
+KeyPress Num_0 1
+Delay 200
+KeyPress Num_0 1
+Delay 200
+KeyPress Num_0 1
 Delay 2000
+KeyPress 0 1
+Delay 41000

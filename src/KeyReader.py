@@ -47,6 +47,7 @@ def on_release_prep(curr_key, exec_func: Callable, scripts: Script):
     if curr_key == keyboard.Key[SUPER_EXIT]:
         # exit on the super exit key
         logging.info("Terminating keyboard listener. Exiting program...")
+        exit(0)
         return False
 
     try:
@@ -98,7 +99,7 @@ def on_release_prep(curr_key, exec_func: Callable, scripts: Script):
             logging.info(
                 f"{process_id} cannot be terminated. Unable to find process according to id."
             )
-            return 
+            return
 
         if need_to_stop_process.is_alive():
             need_to_stop_process.terminate()
