@@ -1,6 +1,6 @@
 [Keys]
-start_key=f2
-stop_key=f1
+start_key=f4
+stop_key=f3
 name=skip
 uuid=a4f1e27f-9aa7-4927-b120-7fb389c7497e
 [Repeat]
@@ -9,5 +9,11 @@ stop_counter=-1
 start_counter=0
 step=1
 [Script]
-KeyPress G 1
-Delay 50
+KeyPress S 1
+Delay 60000
+KeyPress W 1
+Delay 60000
+KeyPress A 1
+Delay 60000
+KeyPress D 1
+Delay 60000

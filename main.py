@@ -1,16 +1,17 @@
 import logging
 from uuid import uuid4
+
 from pynput import keyboard
+
 from src import (
-    on_press,
-    on_release,
+    KeyCombination,
+    Pattern,
+    Repeat,
     Script,
     WindowHandler,
-    Pattern,
-    KeyCombination,
-    Repeat,
+    on_press,
+    on_release,
 )
-
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -21,11 +22,14 @@ logging.basicConfig(
 
 mapping = {
     "ff14": {"script_path": ["root", "FFIV"], "window_name": "final fantasy"},
+    "hogwarts": {"script_path": ["root", "Hogwarts"], "window_name": "Hogwarts Legacy"},
     "lost ark": {
         "script_path": ["root", "Lost Ark"],
         "window_name": "LOST ARK (64-bit, DX11)",
     },
     "FO76": {"script_path": ["root", "FO76"], "window_name": "Fallout76"},
+    "MC": {"script_path": ["root", "Minecraft"], "window_name": "Minecraft Forge"},
+    "WarThunder": {"script_path": ["root", "warthunder"], "window_name": "War Thunder"},
     "test": {"script_path": ["root", "default"], "window_name": "main"},
 }
 
@@ -43,7 +47,7 @@ if __name__ == "__main__":
     # watchmedo auto-restart -p "*.klp" -R python -- main.py
     # logging.info(uuid4())
     logging.info("Starting Main Program...")
-    scripts, instance = startup(map_token="FO76")
+    scripts, instance = startup(map_token="ff14")
     # scripts, instance = startup(map_token="lost ark")
 
     logging.info("Starting Keypress reading...")

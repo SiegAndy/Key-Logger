@@ -1,4 +1,6 @@
-import codecs, json
+import codecs
+import json
+
 from bs4 import BeautifulSoup
 
 

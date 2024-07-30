@@ -1,7 +1,10 @@
-import win32con, win32api, time
+import time
+from functools import partial
 from random import uniform
 from typing import Callable, Union
-from functools import partial
+
+import win32api
+import win32con
 
 
 def SendMessage(hwnd, key_action, vkey_code, lparam):
@@ -9,7 +12,7 @@ def SendMessage(hwnd, key_action, vkey_code, lparam):
     pressdown R key:
     hwndMain, win32con.WM_KEYDOWN,  0x41, 0
     """
-    # print(hwnd, key_action, vkey_code, lparam)
+    print(hwnd, key_action, vkey_code, lparam)
     win32api.SendMessage(hwnd, key_action, vkey_code, lparam)
 
 

@@ -1,11 +1,13 @@
 import json
-import time, logging
-from uuid import UUID, uuid4
-from multipledispatch import dispatch
+import logging
+import time
 from typing import Callable, Dict, List
-from src.Logger import KeyDown, KeyUp, KeyPress, Delay
-from src.utils import mapping
+from uuid import UUID, uuid4
 
+from multipledispatch import dispatch
+
+from src.Logger import Delay, KeyDown, KeyPress, KeyUp
+from src.utils import mapping
 
 Keybd_event = ["KeyDown", "KeyUp", "KeyPress"]
 Actions = ["KeyDown", "KeyUp", "KeyPress", "Delay"]
@@ -27,7 +29,6 @@ def dict_to_object(cls: object, input_dict: Dict[str, Dict]):
 
 
 class stringifyable:
-
     category = "Stringifyable"
 
     @dispatch()
@@ -35,7 +36,6 @@ class stringifyable:
         pass
 
     def stringify(self):
-
         # print(self.__dict__)
         result = f"[{self.category}]\n"
         for name, value in self.__dict__.items():
@@ -43,7 +43,6 @@ class stringifyable:
         return result
 
     def unstringify(self, load_string: str):
-
         attributes = [elem for elem in load_string.split("\n") if elem]
         if attributes[0] == f"[{self.category}]":
             attributes = attributes[1:]
@@ -179,7 +178,6 @@ class Repeat(stringifyable):
                     func()
 
         elif self._type == 1:
-
             timer_interval = ((self._hr * 60) + self._min * 60) + self._sec
             start_timer = time.time()
             end_timer = start_timer + timer_interval
@@ -224,7 +222,6 @@ class Pattern(stringifyable):
         repeat: Repeat = None,
         key_comb: KeyCombination = None,
     ) -> None:
-
         # print(start_counter, stop_counter, step, stop_time_interval)
 
         self._name = name
@@ -270,8 +267,10 @@ class Pattern(stringifyable):
 
     def create_pattern(self, commands: List[str]):
         def create_keyboard_command(action: str, key: str, num: str):
+            if key.upper() in self.mapping:
+                key = key.upper()
             try:
-                curr_vk = self.mapping[key.upper()]
+                curr_vk = self.mapping[key]
                 curr_vk = curr_vk["virtual_key"]
                 num = int(num)
             except KeyError:

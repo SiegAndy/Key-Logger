@@ -49,8 +49,6 @@ def find_dir(dir_name: str, up: int = 0, walking_path: str = ".") -> str:
     return dir_name
 
 
-print()
-
 
 def reformat_directory(target_dir: str):
     """

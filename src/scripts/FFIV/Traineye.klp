@@ -1,6 +1,6 @@
 [Keys]
-start_key=f5
-stop_key=f1
+start_key=f10
+stop_key=f9
 name=Traineye
 uuid=d16e6e90-ad96-411e-9364-d97f39c320ff
 [Repeat]
@@ -16,4 +16,4 @@ Delay 200
 KeyPress Num_0 1
 Delay 2000
 KeyPress 0 1
-Delay 8000
+Delay 12000

@@ -1,7 +1,7 @@
 [Keys]
-start_key=f8
-stop_key=f7
-name=anti-kick
+start_key=f4
+stop_key=f1
+name=left-click
 uuid=67e64827-fa12-4ba8-92d7-0cea415323d6
 [Repeat]
 type=0
@@ -9,5 +9,5 @@ stop_counter=-1
 start_counter=0
 step=1
 [Script]
-KeyPress q 1
-Delay 60000
+KeyPress 1 1
+Delay 10

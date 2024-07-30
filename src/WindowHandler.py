@@ -1,7 +1,12 @@
 import logging
-import win32gui, win32process, win32con, win32api
 from typing import List
-from src.Pattern import Pattern, Repeat, KeyCombination
+
+import win32api
+import win32con
+import win32gui
+import win32process
+
+from src.Pattern import KeyCombination, Pattern, Repeat
 
 
 class WindowHandler:
@@ -33,7 +38,6 @@ class WindowHandler:
         return self.windows
 
     def find_designated_window(self, target_string: str, windows: List = None):
-
         target_string = target_string.lower()
         if windows is None:
             windows = self.windows
@@ -45,6 +49,7 @@ class WindowHandler:
             curr_text = curr_text.lower()
             if target_string in curr_text:
                 if result_window is not None:
+                    print(result_window, curr_text)
                     raise ValueError(
                         "More than one windows with searched string, please be specific!"
                     )

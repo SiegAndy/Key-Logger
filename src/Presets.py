@@ -1,12 +1,8 @@
 import os
 from typing import List
-from src.Pattern import Pattern
-from src.utils import (
-    create_directory,
-    dict_to_klp,
-    find_or_create_scripts_folder,
-)
 
+from src.Pattern import Pattern
+from src.utils import create_directory, dict_to_klp, find_or_create_scripts_folder
 
 DEFAULT = "default"
 

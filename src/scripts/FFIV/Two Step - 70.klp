@@ -16,6 +16,6 @@ Delay 200
 KeyPress Num_0 1
 Delay 2000
 KeyPress 0 1
-Delay 45000
+Delay 37000
 KeyPress - 1
-Delay 38000
+Delay 12000
